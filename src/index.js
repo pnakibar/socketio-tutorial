@@ -18,7 +18,17 @@ app.get('/', (req, res) => res.json({ hello: 'world!' }));
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.on('connection', () => console.log('someone connected'));
+const messages = [];
+
+io.on('connection', (socket) => {
+  socket.emit('messages', messages);
+  socket.emit('hello', 'Welcome!')
+  socket.on('sent message', (message) => {
+    messages.push(message);
+    io.emit('new message', message);
+  });
+});
+
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => console.log(`[x] Magic happens on port: ${port}`));

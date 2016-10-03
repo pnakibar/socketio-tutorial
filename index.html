@@ -8,11 +8,43 @@
 </head>
 
 <body>
-  <p>
-    "Hello"
+  <h1>
+    Ultimate Web Chat 0.1.0
+  </h1>
+  <div id='motd'></div>
+  <p id='messages'>
+
   </p>
+  <input id="new-message" type="text" placeholder="New Message">
+  <button name="button" onclick="sendMessage()">Send</button>
   <script>
-    const socket = io('http://localhost:3000/');
+    const socket = io('http://localhost:3000');
+    const messages = document.getElementById('messages');
+
+    function addMessage(content) {
+      const newDiv = document.createElement('div');
+      const newContent = document.createTextNode(content);
+      newDiv.appendChild(newContent);
+      messages.appendChild(newDiv);
+    }
+
+    function sendMessage() {
+      const newMessage = document.getElementById('new-message').value;
+      socket.emit('sent message', newMessage);
+      document.getElementById('new-message').value = "";
+    }
+
+    socket.on('hello', (data) => {
+      document.getElementById('motd').textContent = data;
+    })
+
+    socket.on('messages', (data) => {
+      data.forEach(m => addMessage(m));
+    })
+
+    socket.on('new message', (data) => {
+      addMessage(data);
+    })
   </script>
 </body>
 
