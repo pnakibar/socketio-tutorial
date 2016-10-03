@@ -1,0 +1,13 @@
+{
+  "ecmaVersion": 6,
+  "loadEagerly": [
+    "src/"
+  ],
+  "plugins": {
+    "node": {},
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": true
+    }
+  }
+}
