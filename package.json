@@ -1,7 +1,5 @@
 {
-  "name": "gvv-model",
-  "version": "0.0.2",
-  "description": "Model library for the GoVivant services",
+  "name": "Web Sockets Playground",
   "main": "dist/index.js",
   "directories": {
     "test": "tests"
@@ -17,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gettyio/govivant-api-model.git"
+    "url": "git+https://github.com/pnakibar/websockets-playground.git"
   },
   "keywords": [
     "express",
@@ -33,7 +31,7 @@
     "test",
     "build"
   ],
-  "homepage": "https://github.com/gettyio/govivant-api-model#readme",
+  "homepage": "https://github.com/pnakibar/websockets-playground#readme",
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",
