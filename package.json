@@ -1,5 +1,5 @@
 {
-  "name": "Web-Sockets-Playground",
+  "name": "socketio-tutorial",
   "main": "dist/index.js",
   "directories": {
     "test": "tests"
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pnakibar/websockets-playground.git"
+    "url": "git+https://github.com/pnakibar/socketio-tutorial.git"
   },
   "keywords": [
     "express",
@@ -31,7 +31,7 @@
     "test",
     "build"
   ],
-  "homepage": "https://github.com/pnakibar/websockets-playground#readme",
+  "homepage": "https://github.com/pnakibar/socketio-tutorial#readme",
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",

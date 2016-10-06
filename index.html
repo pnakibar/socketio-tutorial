@@ -24,9 +24,6 @@
   <button name="button" onclick="sendMessage()">Send</button>
   <script>
     const sioServerURL = 'http://localhost:3000';
-    // const socket = io('http://localhost:3000', {
-    // 'query': 'token=' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'
-    // });
 
     function getNamePassword() {
       const name = document.getElementById('name').value;
@@ -36,66 +33,84 @@
         password
       }
     }
+    const headers = new Headers();
+    headers.set('Content-Type', 'application/json');
 
     function signup() {
-      console.log('signup');
       return fetch(`${sioServerURL}/signup`, {
+          headers,
           method: 'post',
-          body: getNamePassword()
+          body: JSON.stringify(getNamePassword()),
         })
-        .then(x => console.log(x));
+        .then(x => x.json())
+        .then(token => loginWS(token));
     }
 
     function login() {
-      fetch(`${sioServerURL}/login`, {
+      var data = new FormData();
+      data.append('json', JSON.stringify(getNamePassword()));
+      console.log(data);
+      return fetch(`${sioServerURL}/login`, {
+          headers,
           method: 'post',
-          body: getNamePassword()
+          body: JSON.stringify(getNamePassword()),
         })
-        .then(x => console.log(x))
-        .catch(e => console.log(e));
+        .then(x => x.json())
+        .then(token => loginWS(token));
     }
 
-    const sioOptions = {
-      'query': 'token=' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'
-    };
-    let socket = io(sioServerURL);
 
-    const messages = document.getElementById('messages');
-    const motd = document.getElementById('motd');
+    let sendMessage;
 
-    socket.on('connect', () => {
+    function loginWS(token) {
+      const sioOptions = {
+        'query': 'token=' + token
+      };
+      const socket = io(sioServerURL, sioOptions);
 
-      socket.on('error', (data) => {
-        if (data.type === 'UnauthorizedError') {
-          motd.textContent = 'Suas credenciais estão inválidas!'
+      const messages = document.getElementById('messages');
+      const motd = document.getElementById('motd');
+
+      socket.on('connect', () => {
+
+        socket.on('error', (data) => {
+          if (data.type === 'UnauthorizedError') {
+            motd.textContent = 'Suas credenciais estão inválidas!'
+          }
+        });
+
+        function addMessage({
+          userName,
+          message
+        }) {
+          const newDiv = document.createElement('div');
+          const newContent = document.createTextNode(`${userName}: ${message}`);
+          newDiv.appendChild(newContent);
+          messages.appendChild(newDiv);
         }
-      });
 
-      function addMessage(content) {
-        const newDiv = document.createElement('div');
-        const newContent = document.createTextNode(content);
-        newDiv.appendChild(newContent);
-        messages.appendChild(newDiv);
-      }
+        function emitMessage() {
+          console.log('emit');
+          const newMessage = document.getElementById('new-message').value;
+          socket.emit('sent message', newMessage);
+          document.getElementById('new-message').value = "";
+        }
+        sendMessage = emitMessage; // hack
 
-      function sendMessage() {
-        const newMessage = document.getElementById('new-message').value;
-        socket.emit('sent message', newMessage);
-        document.getElementById('new-message').value = "";
-      }
+        socket.on('hello', (data) => {
+          document.getElementById('motd').textContent = data;
+        })
 
-      socket.on('hello', (data) => {
-        document.getElementById('motd').textContent = data;
+        socket.on('messages', (data) => {
+          data.forEach(m => addMessage(m));
+        })
+
+        socket.on('new message', (data) => {
+          console.log('new message');
+          addMessage(data);
+        })
       })
-
-      socket.on('messages', (data) => {
-        data.forEach(m => addMessage(m));
-      })
-
-      socket.on('new message', (data) => {
-        addMessage(data);
-      })
-    })
+    }
   </script>
 </body>
 
