@@ -17,13 +17,13 @@ const SECRET = 'secret'; // insira algo mais seguro!
 const messages = [];
 
 const app = express();
-const server = http.Server(app);
+const server = new http.Server(app);
 const io = socketio.listen(server);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`[x] Magic happens on port: ${port}`));
 
-app.use(cors);
+app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -56,9 +56,6 @@ app.post('/login', (req, res) => {
   }
 });
 
-
-
-
 // definir o middleware
 io.use(socketioJwt.authorize({
   secret: 'secret',
@@ -73,7 +70,6 @@ io.on('connection', (socket) => {
     io.emit('new message', message);
   });
 });
-
 
 
 export default app;
