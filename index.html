@@ -11,6 +11,11 @@
   <h1>
     Ultimate Web Chat 0.1.0
   </h1>
+  <input id="name" type="text" placeholder="name">
+  <input id="password" type="password" placeholder="password">
+  <button id="login-button" name="button" onclick="login()">Login</button>
+  <button id="signup-button" name="button" onclick="signup()">Signup</button>
+
   <div id='motd'></div>
   <p id='messages'>
 
@@ -18,32 +23,78 @@
   <input id="new-message" type="text" placeholder="New Message">
   <button name="button" onclick="sendMessage()">Send</button>
   <script>
-    const socket = io('http://localhost:3000');
+    const sioServerURL = 'http://localhost:3000';
+    // const socket = io('http://localhost:3000', {
+    // 'query': 'token=' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'
+    // });
+
+    function getNamePassword() {
+      const name = document.getElementById('name').value;
+      const password = document.getElementById('password').value;
+      return {
+        name,
+        password
+      }
+    }
+
+    function signup() {
+      console.log('signup');
+      return fetch(`${sioServerURL}/signup`, {
+          method: 'post',
+          body: getNamePassword()
+        })
+        .then(x => console.log(x));
+    }
+
+    function login() {
+      fetch(`${sioServerURL}/login`, {
+          method: 'post',
+          body: getNamePassword()
+        })
+        .then(x => console.log(x))
+        .catch(e => console.log(e));
+    }
+
+    const sioOptions = {
+      'query': 'token=' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'
+    };
+    let socket = io(sioServerURL);
+
     const messages = document.getElementById('messages');
+    const motd = document.getElementById('motd');
 
-    function addMessage(content) {
-      const newDiv = document.createElement('div');
-      const newContent = document.createTextNode(content);
-      newDiv.appendChild(newContent);
-      messages.appendChild(newDiv);
-    }
+    socket.on('connect', () => {
 
-    function sendMessage() {
-      const newMessage = document.getElementById('new-message').value;
-      socket.emit('sent message', newMessage);
-      document.getElementById('new-message').value = "";
-    }
+      socket.on('error', (data) => {
+        if (data.type === 'UnauthorizedError') {
+          motd.textContent = 'Suas credenciais estão inválidas!'
+        }
+      });
 
-    socket.on('hello', (data) => {
-      document.getElementById('motd').textContent = data;
-    })
+      function addMessage(content) {
+        const newDiv = document.createElement('div');
+        const newContent = document.createTextNode(content);
+        newDiv.appendChild(newContent);
+        messages.appendChild(newDiv);
+      }
 
-    socket.on('messages', (data) => {
-      data.forEach(m => addMessage(m));
-    })
+      function sendMessage() {
+        const newMessage = document.getElementById('new-message').value;
+        socket.emit('sent message', newMessage);
+        document.getElementById('new-message').value = "";
+      }
 
-    socket.on('new message', (data) => {
-      addMessage(data);
+      socket.on('hello', (data) => {
+        document.getElementById('motd').textContent = data;
+      })
+
+      socket.on('messages', (data) => {
+        data.forEach(m => addMessage(m));
+      })
+
+      socket.on('new message', (data) => {
+        addMessage(data);
+      })
     })
   </script>
 </body>

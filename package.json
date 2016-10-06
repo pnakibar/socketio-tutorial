@@ -1,5 +1,5 @@
 {
-  "name": "Web Sockets Playground",
+  "name": "Web-Sockets-Playground",
   "main": "dist/index.js",
   "directories": {
     "test": "tests"
@@ -69,8 +69,10 @@
     "connect": "^3.4.1",
     "cors": "^2.7.1",
     "express": "^4.14.0",
+    "jsonwebtoken": "^7.1.9",
     "morgan": "^1.7.0",
     "multer": "^1.1.0",
-    "socket.io": "^1.4.8"
+    "socket.io": "^1.4.8",
+    "socketio-jwt": "^4.5.0"
   }
 }
